@@ -8,10 +8,22 @@ def setup_event_sourcing():
     event_store = EventStore('events.db')
     read_model = ReadModel('readmodel.json')
 
-    # Tentar conectar ao Redis, com fallback para modo simulado se falhar
+    # Configurar o Redis real
+    # Usar o Redis local na porta padrão 6379
+    redis_host = 'localhost'
+    redis_port = 6379
+    redis_db = 0
+
     try:
-        event_bus = EventBus()
-        print("Conectado ao Redis com sucesso.")
+        # Tentar conectar ao Redis real
+        event_bus = EventBus(host=redis_host, port=redis_port, db=redis_db)
+        print(f"Conectado ao Redis com sucesso em {redis_host}:{redis_port} (DB: {redis_db}).")
+
+        # Verificar a conexão com o Redis
+        info = event_bus.redis.info()
+        print(f"Versão do Redis: {info.get('redis_version')}")
+        print(f"Clientes conectados: {info.get('connected_clients')}")
+        print(f"Memória utilizada: {info.get('used_memory_human')}")
     except Exception as e:
         print(f"Erro ao conectar ao Redis: {e}")
         print("Usando modo simulado para o Event Bus.")

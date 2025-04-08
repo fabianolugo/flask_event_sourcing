@@ -65,7 +65,7 @@
             </div>
         </div>
 
-        {% if queue_info.status == 'Connected' %}
+        {% if queue_info.status == 'Connected' or queue_info.status == 'Connected (Direct)' %}
             <div class="row">
                 <div class="col-md-6">
                     <div class="card mb-4">
@@ -79,6 +79,14 @@
                                     <span class="badge bg-primary rounded-pill">{{ queue_info.redis_version }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Redis Mode
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.stats.redis_mode if queue_info.stats and queue_info.stats.redis_mode else 'standalone' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Operating System
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.stats.os if queue_info.stats and queue_info.stats.os else 'unknown' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Connected Clients
                                     <span class="badge bg-primary rounded-pill">{{ queue_info.connected_clients }}</span>
                                 </li>
@@ -86,7 +94,37 @@
                                     Memory Usage
                                     <span class="badge bg-primary rounded-pill">{{ queue_info.used_memory_human }}</span>
                                 </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Uptime
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.stats.uptime_days if queue_info.stats and queue_info.stats.uptime_days else '0' }} days</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total Commands Processed
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.stats.total_commands_processed if queue_info.stats and queue_info.stats.total_commands_processed else '0' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total Connections Received
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.stats.total_connections_received if queue_info.stats and queue_info.stats.total_connections_received else '0' }}</span>
+                                </li>
                             </ul>
+
+                            {% if queue_info.stats and queue_info.stats.connection_info %}
+                            <h6 class="mt-3">Connection Information</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Host
+                                    <span class="badge bg-info rounded-pill">{{ queue_info.stats.connection_info.host }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Port
+                                    <span class="badge bg-info rounded-pill">{{ queue_info.stats.connection_info.port }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Database
+                                    <span class="badge bg-info rounded-pill">{{ queue_info.stats.connection_info.db }}</span>
+                                </li>
+                            </ul>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -108,6 +146,33 @@
                             {% endif %}
                         </div>
                     </div>
+
+                    {% if queue_info.stats and queue_info.stats.keys_info %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Redis Keys</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total Keys
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.stats.keys_info.total_keys }}</span>
+                                </li>
+                            </ul>
+
+                            {% if queue_info.stats.keys_info.event_keys %}
+                            <h6 class="mt-3">Event Keys</h6>
+                            <ul class="list-group">
+                                {% for key in queue_info.stats.keys_info.event_keys %}
+                                <li class="list-group-item">{{ key }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p class="text-muted mt-3">No event keys found</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         {% else %}
