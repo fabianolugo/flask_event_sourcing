@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Queue - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Event Sourcing App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/message-queue">Message Queue</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Message Queue</h1>
+            <a href="/admin" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Message Queue Information</h5>
+                <p class="card-text">
+                    The Message Queue is responsible for distributing events between the Event Store and the Read Model.
+                    It ensures that all events are processed in the correct order and that the Read Model is kept in sync with the Event Store.
+                </p>
+
+                {% if queue_info.status == 'Connected' or queue_info.status == 'Connected (Direct)' %}
+                    <div class="alert alert-success">
+                        <strong>Status:</strong> {{ queue_info.status }}
+                    </div>
+                {% elif queue_info.status == 'Simulated' %}
+                    <div class="alert alert-warning">
+                        <strong>Status:</strong> Usando Event Bus simulado em memória
+                        {% if queue_info.error %}
+                            <p>Erro: {{ queue_info.error }}</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger">
+                        <strong>Status:</strong> {{ queue_info.status }}
+                        {% if queue_info.error %}
+                            <p>Erro: {{ queue_info.error }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if queue_info.status == 'Connected' %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Redis Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Redis Version
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.redis_version }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Connected Clients
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.connected_clients }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Memory Usage
+                                    <span class="badge bg-primary rounded-pill">{{ queue_info.used_memory_human }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Pub/Sub Channels</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if queue_info.pubsub_channels %}
+                                <ul class="list-group">
+                                    {% for channel in queue_info.pubsub_channels %}
+                                        <li class="list-group-item">{{ channel }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted">No active channels</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Simulated Event Bus</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        A aplicação está usando um barramento de eventos simulado em memória.
+                        Isso fornece a mesma funcionalidade, mas sem os benefícios de uma fila de mensagens distribuída.
+                    </p>
+                    <div class="alert alert-success">
+                        <strong>Status:</strong> Funcionando corretamente em modo simulado
+                    </div>
+                    <h6>Estatísticas do Event Bus Simulado:</h6>
+                    <ul class="list-group mt-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Tipo
+                            <span class="badge bg-primary rounded-pill">Simulado em Memória</span>
+                        </li>
+                        {% if queue_info.stats %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Handlers Registrados
+                            <span class="badge bg-primary rounded-pill">{{ queue_info.stats.registered_handlers }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Eventos Processados
+                            <span class="badge bg-primary rounded-pill">{{ queue_info.stats.processed_events }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Tempo de Atividade
+                            <span class="badge bg-primary rounded-pill">{{ queue_info.stats.uptime_seconds|round(1) }} segundos</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Tamanho da Fila
+                            <span class="badge bg-primary rounded-pill">{{ queue_info.stats.queue_size }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Tipos de Eventos Registrados:</strong>
+                            <ul class="mt-2">
+                                {% for event_type in queue_info.stats.event_types %}
+                                <li>{{ event_type }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Handlers Registrados
+                            <span class="badge bg-primary rounded-pill">6</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Canal de Eventos
+                            <span class="badge bg-primary rounded-pill">events</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    <div class="alert alert-info mt-3">
+                        <strong>Nota:</strong> Para usar o Redis em vez do modo simulado, edite o arquivo <code>event_sourcing_config.py</code>
+                        e descomente o código para tentar conectar ao Redis.
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

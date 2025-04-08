@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Sourcing App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .hero {
+            background-color: #f8f9fa;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+        }
+        .feature-card {
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Event Sourcing App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    {% if is_logged_in %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if is_logged_in %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login with Google</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mt-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <section class="hero text-center">
+            <div class="container">
+                <h1 class="display-4">Event Sourcing Architecture</h1>
+                <p class="lead">A demonstration of Event Sourcing with separate write and read databases</p>
+                {% if is_logged_in %}
+                    <div class="mt-4">
+                        <a href="/dashboard" class="btn btn-primary btn-lg">Go to Dashboard</a>
+                        <a href="/admin" class="btn btn-outline-secondary btn-lg ms-2">Admin Panel</a>
+                    </div>
+                {% else %}
+                    <div class="mt-4">
+                        <a href="/login" class="btn btn-primary btn-lg">
+                            <i class="fab fa-google me-2"></i> Login with Google
+                        </a>
+                        <a href="/admin" class="btn btn-outline-secondary btn-lg ms-2">Admin Panel</a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="features">
+            <h2 class="text-center mb-4">Architecture Features</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h5 class="card-title">Event Store</h5>
+                            <p class="card-text">SQLite database that stores all events as the source of truth.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <h5 class="card-title">Message Queue</h5>
+                            <p class="card-text">Simulated message broker for event distribution.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h5 class="card-title">Read Model</h5>
+                            <p class="card-text">TinyDB NoSQL database optimized for queries.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-5 mb-5">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">About Event Sourcing</h3>
+                    <p class="card-text">
+                        Event Sourcing is an architectural pattern that stores all changes to an application's state as a sequence of events.
+                        These events are the source of truth, and the current state can be reconstructed by replaying the events.
+                    </p>
+                    <p class="card-text">
+                        This application demonstrates Event Sourcing with:
+                    </p>
+                    <ul>
+                        <li><strong>Command/Write Side:</strong> Processes commands and generates events stored in SQLite</li>
+                        <li><strong>Event Bus:</strong> Distributes events between write and read sides</li>
+                        <li><strong>Query/Read Side:</strong> Maintains a read-optimized view of the data in TinyDB</li>
+                    </ul>
+                    <p class="card-text">
+                        <a href="/admin" class="btn btn-primary">Explore the Admin Panel</a> to see the events, read model, and message queue in action.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>Event Sourcing Demo Application</p>
+            <p class="mb-0">Built with Flask, SQLite, and TinyDB</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

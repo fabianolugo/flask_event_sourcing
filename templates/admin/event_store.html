@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Store - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .event-card {
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+        }
+        .event-created { border-left-color: #28a745; }
+        .event-updated { border-left-color: #ffc107; }
+        .event-deleted { border-left-color: #dc3545; }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Event Sourcing App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/event-store">Event Store</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Event Store</h1>
+            <a href="/admin" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Event Store Information</h5>
+                <p class="card-text">
+                    The Event Store is the source of truth in an Event Sourcing architecture. 
+                    It stores all events that have occurred in the system, allowing for complete 
+                    reconstruction of the application state at any point in time.
+                </p>
+                <p><strong>Total Events:</strong> {{ events|length }}</p>
+            </div>
+        </div>
+        
+        <h2>Recent Events</h2>
+        
+        {% if events %}
+            {% for event in events %}
+                <div class="card event-card {% if 'CREATED' in event.event_type %}event-created{% elif 'UPDATED' in event.event_type %}event-updated{% elif 'DELETED' in event.event_type %}event-deleted{% endif %}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="card-title">{{ event.event_type }}</h5>
+                            <small class="text-muted">{{ event.timestamp }}</small>
+                        </div>
+                        <h6 class="card-subtitle mb-2 text-muted">Aggregate ID: {{ event.aggregate_id }}</h6>
+                        <p class="card-text">Version: {{ event.version }}</p>
+                        <div class="mt-3">
+                            <h6>Event Data:</h6>
+                            <pre>{{ event.data|tojson(indent=2) }}</pre>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">No events found in the Event Store.</div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

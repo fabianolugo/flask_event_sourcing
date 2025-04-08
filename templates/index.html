@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to Flask App</h1>
+    <p class="lead">This is a simple web application built with Flask.</p>
+    <hr class="my-4">
+    <p>It allows you to create an account, log in, and manage your items.</p>
+    {% if not current_user.is_authenticated %}
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('routes.register') }}" role="button">Register</a>
+        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('routes.login') }}" role="button">Login</a>
+    </div>
+    {% else %}
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('routes.dashboard') }}" role="button">Go to Dashboard</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Create an Account</h5>
+                <p class="card-text">Register to start using the application.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Manage Items</h5>
+                <p class="card-text">Create, update, and delete your items.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">API Access</h5>
+                <p class="card-text">Access your data through our RESTful API.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

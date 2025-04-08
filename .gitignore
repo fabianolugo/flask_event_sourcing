@@ -1,0 +1,36 @@
+# Ambiente virtual
+venv/
+env/
+ENV/
+
+# Arquivos de configuração com credenciais
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+config_local.py
+
+# Banco de dados
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos de cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Logs
+*.log
+
+# Arquivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
