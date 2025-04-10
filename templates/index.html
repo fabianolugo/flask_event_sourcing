@@ -14,6 +14,9 @@
     {% else %}
     <div class="mt-4">
         <a class="btn btn-primary btn-lg" href="{{ url_for('routes.dashboard') }}" role="button">Go to Dashboard</a>
+        {% if user.role == 'admin' %}
+        <a class="btn btn-success btn-lg" href="/admin/users" role="button">Gerenciar Usuários</a>
+        {% endif %}
     </div>
     {% endif %}
 </div>

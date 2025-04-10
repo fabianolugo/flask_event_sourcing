@@ -60,9 +60,31 @@ class EventBus:
     def get_stats(self):
         """Retorna estatísticas do Redis"""
         try:
+            # Verificar se o Redis está conectado
+            if not self.redis.ping():
+                return {
+                    'status': 'Disconnected',
+                    'error': 'Não foi possível conectar ao Redis'
+                }
+
+            # Obter informações gerais do Redis
             info = self.redis.info()
-            pubsub_channels = self.redis.pubsub_channels()
-            pubsub_numsub = self.redis.pubsub_numsub()
+
+            # Obter informações de canais e mensagens
+            pubsub_channels = []
+            try:
+                channels = self.redis.pubsub_channels()
+                pubsub_channels = [channel.decode('utf-8') for channel in channels]
+            except Exception as e:
+                print(f"Erro ao obter canais: {e}")
+
+            # Obter informações de assinantes
+            pubsub_numsub = []
+            try:
+                numsub = self.redis.pubsub_numsub()
+                pubsub_numsub = [(channel.decode('utf-8'), count) for channel, count in numsub]
+            except Exception as e:
+                print(f"Erro ao obter assinantes: {e}")
 
             # Obter informações sobre as chaves no Redis
             keys_info = {}
@@ -74,6 +96,11 @@ class EventBus:
                 event_keys = self.redis.keys('events:*')
                 keys_info['event_keys'] = [key.decode('utf-8') for key in event_keys]
                 keys_info['event_keys_count'] = len(event_keys)
+
+                # Obter todas as chaves para debug
+                all_keys = self.redis.keys('*')
+                keys_info['all_keys'] = [key.decode('utf-8') for key in all_keys]
+                keys_info['all_keys_count'] = len(all_keys)
             except Exception as e:
                 keys_info['error'] = str(e)
 

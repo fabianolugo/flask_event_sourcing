@@ -39,6 +39,7 @@ def setup_event_sourcing():
     event_bus.register_handler('ITEM_CREATED', handlers.handle_item_created)
     event_bus.register_handler('ITEM_UPDATED', handlers.handle_item_updated)
     event_bus.register_handler('ITEM_DELETED', handlers.handle_item_deleted)
+    event_bus.register_handler('TEST_EVENT', handlers.handle_test_event)
 
     # Iniciar o event bus
     event_bus.start()

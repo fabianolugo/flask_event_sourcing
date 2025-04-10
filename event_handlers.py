@@ -82,3 +82,38 @@ class EventHandlers:
 
         # Remover o item do Read Model
         self.read_model.delete_item(item_id)
+
+    def handle_user_deleted(self, event):
+        """Manipula eventos de exclusão de usuário"""
+        # Obter o ID do usuário
+        user_id = event['aggregate_id']
+
+        # Verificar se os dados já estão deserializados
+        if isinstance(event['data'], str):
+            import json
+            deletion_info = json.loads(event['data'])
+        else:
+            deletion_info = event['data']
+
+        # Registrar informações sobre a exclusão (opcional)
+        print(f"Usuário {user_id} excluído em {deletion_info.get('deleted_at', 'data desconhecida')}")
+
+        # Remover o usuário do Read Model
+        self.read_model.delete_user(user_id)
+
+    def handle_test_event(self, event):
+        """Manipula eventos de teste"""
+        # Obter o ID do agregado
+        aggregate_id = event['aggregate_id']
+
+        # Verificar se os dados já estão deserializados
+        if isinstance(event['data'], str):
+            import json
+            data = json.loads(event['data'])
+        else:
+            data = event['data']
+
+        # Registrar informações sobre o evento de teste
+        print(f"Evento de teste recebido: {aggregate_id}")
+        print(f"Mensagem: {data.get('message', 'Sem mensagem')}")
+        print(f"Timestamp: {data.get('timestamp', 'Sem timestamp')}")

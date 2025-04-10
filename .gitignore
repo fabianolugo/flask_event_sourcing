@@ -15,6 +15,7 @@ config_local.py
 *.db
 *.sqlite
 *.sqlite3
+readmodel.json
 
 # Arquivos de cache Python
 __pycache__/
